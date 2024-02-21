@@ -61,6 +61,7 @@ void remove_element_beginning(List *list) {
     if (list->size > 0) {
         for (int i = 0; i < list->size - 1; ++i) {
             list->array[i] = list->array[i + 1];
+
 void add_element_end(List *list, int element) {
     if (list->size >= list->capacity) {
         list->capacity *= 2;
@@ -72,6 +73,16 @@ void add_element_end(List *list, int element) {
         list->size--;
     }
 }
+
+void remove_element_at_position(List *list, int position) {
+    if (position >= 0 && position < list->size) {
+        for (int i = position; i < list->size - 1; ++i) {
+            list->array[i] = list->array[i + 1];
+        }
+        list->size--;
+    }
+}
+
 
 void insert_element_at_position(List *list, int element, int position) {
     if (position >= 0 && position <= list->size) {
