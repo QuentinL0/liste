@@ -1,94 +1,104 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
+#define INITIAL_CAPACITY 10
 
-typedef struct Element Element;
-struct Element
-{
-    int nombre;
-    Element *suivant;
-};
+typedef struct {
+    int *array;
+    int size;  
+    int capacity; 
+} List;
 
-typedef struct Liste Liste;
-struct Liste
-{
-    Element *premier;
-};
-
-Liste *initialisation()
-{
-    Liste *liste = malloc(sizeof(*liste));
-    Element *element = malloc(sizeof(*element));
-
-    if (liste == NULL || element == NULL)
-    {
-        exit(EXIT_FAILURE);
-    }
-
-    element->nombre = 0;
-    element->suivant = NULL;
-    liste->premier = element;
-
-    return liste;
+void initialize_list(List *list) {
+    list->array = (int *)malloc(INITIAL_CAPACITY * sizeof(int));
+    list->size = 0;
+    list->capacity = INITIAL_CAPACITY;
 }
 
-void insertion(Liste *liste, int nvNombre)
-{
-    /* Création du nouvel élément */
-    Element *nouveau = malloc(sizeof(*nouveau));
-    if (liste == NULL || nouveau == NULL)
-    {
-        exit(EXIT_FAILURE);
-    }
-    nouveau->nombre = nvNombre;
-
-    /* Insertion de l'élément au début de la liste */
-    nouveau->suivant = liste->premier;
-    liste->premier = nouveau;
+void free_list(List *list) {
+    free(list->array);
+    list->size = 0;
+    list->capacity = 0;
 }
 
-void suppression(Liste *liste)
-{
-    if (liste == NULL)
-    {
-        exit(EXIT_FAILURE);
+void add_element_end(List *list, int element) {
+    if (list->size >= list->capacity) {
+        list->capacity *= 2;
+        list->array = (int *)realloc(list->array, list->capacity * sizeof(int));
     }
+    list->array[list->size++] = element;
+}
 
-    if (liste->premier != NULL)
-    {
-        Element *aSupprimer = liste->premier;
-        liste->premier = liste->premier->suivant;
-        free(aSupprimer);
+void display_list(List *list) {
+    printf("Liste: ");
+    for (int i = 0; i < list->size; ++i) {
+        printf("%d ", list->array[i]);
+    }
+    printf("\n");
+}
+
+void remove_element_end(List *list) {
+    if (list->size > 0) {
+        list->size--;
     }
 }
 
-void afficherListe(Liste *liste)
-{
-    if (liste == NULL)
-    {
-        exit(EXIT_FAILURE);
+void remove_element_beginning(List *list) {
+    if (list->size > 0) {
+        for (int i = 0; i < list->size - 1; ++i) {
+            list->array[i] = list->array[i + 1];
+        }
+        list->size--;
     }
-
-    Element *actuel = liste->premier;
-
-    while (actuel != NULL)
-    {
-        printf("%d -> ", actuel->nombre);
-        actuel = actuel->suivant;
-    }
-    printf("NULL\n");
 }
 
-int main()
-{
-    Liste *maListe = initialisation();
+void insert_element_at_position(List *list, int element, int position) {
+    if (position >= 0 && position <= list->size) {
+        if (list->size >= list->capacity) {
+            list->capacity *= 2;
+            list->array = (int *)realloc(list->array, list->capacity * sizeof(int));
+        }
+        for (int i = list->size; i > position; --i) {
+            list->array[i] = list->array[i - 1];
+        }
+        list->array[position] = element;
+        list->size++;
+    }
+}
 
-    insertion(maListe, 4);
-    insertion(maListe, 8);
-    insertion(maListe, 15);
-    suppression(maListe);
+int is_element_present(List *list, int element) {
+    for (int i = 0; i < list->size; ++i) {
+        if (list->array[i] == element) {
+            return 1;
+        }
+    }
+    return 0;
+}
 
-    afficherListe(maListe);
+int main() {
+    List list;
+    initialize_list(&list);
+
+    add_element_end(&list, 5);
+    add_element_end(&list, 10);
+    add_element_end(&list, 15);
+
+    display_list(&list);
+
+    remove_element_end(&list);
+    display_list(&list);
+
+    remove_element_beginning(&list);
+    display_list(&list);
+
+    insert_element_at_position(&list, 20, 1);
+    display_list(&list);
+
+    printf("Element 10 est %s dans la liste.\n", is_element_present(&list, 10) ? "présent" : "absent");
+    printf("Element 25 est %s dans la liste.\n", is_element_present(&list, 25) ? "présent" : "absent");
+
+    free_list(&list); 
 
     return 0;
 }
