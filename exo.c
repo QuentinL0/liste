@@ -30,6 +30,19 @@ void add_element_end(List *list, int element) {
     list->array[list->size++] = element;
 }
 
+void add_element_beginning(List *list, int element) {
+    if (list->size >= list->capacity) {
+        list->capacity *= 2;
+        list->array = (int *)realloc(list->array, list->capacity * sizeof(int));
+    }
+        for (int i = list->size; i > 0; --i) {
+        list->array[i] = list->array[i - 1];
+    }
+    list->array[0] = element;
+    list->size++;
+}
+
+
 void display_list(List *list) {
     printf("Liste: ");
     for (int i = 0; i < list->size; ++i) {
@@ -48,6 +61,13 @@ void remove_element_beginning(List *list) {
     if (list->size > 0) {
         for (int i = 0; i < list->size - 1; ++i) {
             list->array[i] = list->array[i + 1];
+void add_element_end(List *list, int element) {
+    if (list->size >= list->capacity) {
+        list->capacity *= 2;
+        list->array = (int *)realloc(list->array, list->capacity * sizeof(int));
+    }
+    list->array[list->size++] = element;
+}
         }
         list->size--;
     }
